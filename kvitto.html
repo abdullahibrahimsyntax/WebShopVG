@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Orderbekräftelse - COPIA</title>
+    <link href="style.css" rel="stylesheet">
+</head>
+<body>
+    <div class="slider">
+        <h1>COPIA</h1>
+    </div>
+
+    <div class="container">
+        <div class="receipt-container">
+            <div class="receipt-header">
+                <div class="checkmark">✓</div>
+                <h2>Tack för din beställning!</h2>
+                <p>Din order är mottagen och behandlas nu.</p>
+            </div>
+            
+            <div class="order-info">
+                <h3 class="section-title">Orderinformation</h3>
+                <p><strong>Ordernummer:</strong> <span class="order-number" id="orderId"></span></p>
+                <p><strong>Orderdatum:</strong> <span id="orderDate"></span></p>
+            </div>
+            
+            <div class="product-info">
+                <h3 class="section-title">Produktinformation</h3>
+                <div id="productInfo"></div>
+            </div>
+            
+            <div class="customer-info">
+                <h3 class="section-title">Kundinformation</h3>
+                <p><strong>Namn:</strong> <span id="customerName"></span></p>
+                <p><strong>E-post:</strong> <span id="customerEmail"></span></p>
+                <p><strong>Telefon:</strong> <span id="customerPhone"></span></p>
+            </div>
+            
+            <div class="delivery-info">
+                <h3 class="section-title">Leveransinformation</h3>
+                <p id="deliveryAddress"></p>
+            </div>
+            
+            <div class="text-center mt-4 no-print">
+                <button onclick="window.print()" class="btn btn-outline-primary btn-print">
+                    Skriv ut kvitto
+                </button>
+                <a href="index.html" class="btn btn-primary">
+                    Tillbaka till startsidan
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script src="kvittojs.js"></script>
+</body>
+</html>
