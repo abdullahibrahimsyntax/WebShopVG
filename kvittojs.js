@@ -1,41 +1,37 @@
-document.addEventListener('DOMContentLoaded', function() {
-    // Hämta orderdata från localStorage
-    const orderData = JSON.parse(localStorage.getItem('currentOrder'));
+document.addEventListener('DOMContentLoaded', function () {
+    // Hämta den aktuella ordern från localStorage
+    const currentOrder = JSON.parse(localStorage.getItem('currentOrder'));
 
-    
-    if (orderData) {
-        // Visa orderinformation
-        document.getElementById('orderId').textContent = orderData.orderNumber;
-        document.getElementById('orderDate').textContent = new Date(orderData.orderDate).toLocaleString('sv-SE');
-        
-        // Visa kundinformation
-        document.getElementById('customerName').textContent = orderData.customer.name;
-        document.getElementById('customerEmail').textContent = orderData.customer.email;
-        document.getElementById('customerPhone').textContent = orderData.customer.phone;
-        
-        // Visa leveransadress
-        const address = `Adress: ${orderData.customer.address.street}, Postnummer: ${orderData.customer.address.zip}, Postort: ${orderData.customer.address.city}`;
-        document.getElementById('deliveryAddress').textContent = address;
-        
-        // Visa produktinformation
-        displayProductDetails(orderData);
-    } else {
-        // Visa felmeddelande om ingen order hittades
-        document.querySelector('.receipt-container').innerHTML = `
-            <div class="alert alert-warning">
-                <h4>Ingen order hittades</h4>
-                <p>Det verkar som att du kom hit direkt utan att göra en beställning.</p>
-                <a href="index.html" class="btn btn-primary">Gå till startsidan</a>
-            </div>
-        `;
+    if (!currentOrder || !currentOrder.cart || currentOrder.cart.length === 0) {
+        alert('Ingen order hittades! Vänligen gör en beställning först.');
+        window.location.href = 'index.html';
+        return;
     }
+
+    // Visa orderinformation
+    document.getElementById('orderId').textContent = currentOrder.orderId || 'Ej tillgängligt';
+    document.getElementById('orderDate').textContent = currentOrder.orderDate || 'Ej tillgängligt';
+
+    // Visa kundinformation
+    document.getElementById('customerName').textContent = currentOrder.customer.name || 'Ej tillgängligt';
+    document.getElementById('customerEmail').textContent = currentOrder.customer.email || 'Ej tillgängligt';
+    document.getElementById('customerPhone').textContent = currentOrder.customer.phone || 'Ej tillgängligt';
+    document.getElementById('deliveryAddress').textContent = currentOrder.customer.address || 'Ej tillgängligt';
+
+    // Visa produkterna i ordern
+    const productInfoContainer = document.getElementById('productInfo');
+    let total = 0;
+    currentOrder.cart.forEach(item => {
+        const itemTotal = item.quantity * item.price;
+        total += itemTotal;
+
+        const productElement = document.createElement('p');
+        productElement.textContent = `${item.title} - Antal: ${item.quantity} - Pris: ${item.price} kr - Summa: ${itemTotal} kr`;
+        productInfoContainer.appendChild(productElement);
+    });
+
+    // Visa totalsumman
+    const totalElement = document.createElement('p');
+    totalElement.innerHTML = `<strong>Totalsumma: ${total} kr</strong>`;
+    productInfoContainer.appendChild(totalElement);
 });
-function displayProductDetails(orderData) {
-    const productDetails = document.getElementById('productInfo');
-    
-    productDetails.innerHTML = `
-        <p><strong>Produkt:</strong> ${orderData.product.title || 'Produktinformation saknas'}</p>
-        <p><strong>Pris:</strong> $${orderData.product.price || '0'}</p>
-        ${orderData.product.image ? `<img src="${orderData.product.image}" class="product-image img-fluid">` : ''}
-    `;
-}

@@ -1,75 +1,100 @@
 document.addEventListener('DOMContentLoaded', function () {
-    // Hämta produktens namn från URL:en
-    const urlParams = new URLSearchParams(window.location.search);
-    const produkt = urlParams.get('product');
-    const price = urlParams.get('price');
-    const image = urlParams.get('image');
-    console.log('Produkt från URL:', produkt);
-    console.log('Pris från URL:', price);
-    console.log('Bild från URL:', image);
+    // Kontrollera om orderData saknas och skapa en standardstruktur
+    if (!localStorage.getItem('orderData')) {
+        const defaultOrderData = {
+            orderId: null,
+            orderDate: null,
+            customer: null,
+            cart: []
+        };
+        localStorage.setItem('orderData', JSON.stringify(defaultOrderData));
+    }
 
-    // Visa produktnamn om det finns
-    const produktDisplay = document.getElementById('productInfo');
-    if (produktDisplay && produkt) {
-        produktDisplay.textContent = `Du beställer: ${produkt}`;
-    }else {
-        console.error('Produktnamn hittades inte i URL eller elementet för produktnamn hittades inte!');
-        alert("Ingen product hittades, Vänligen välj en produkt.");
+    // Kontrollera om currentOrder saknas och skapa en standardstruktur
+    if (!localStorage.getItem('currentOrder')) {
+        const defaultOrder = {
+            orderId: null,
+            orderDate: null,
+            customer: {
+                name: '',
+                email: '',
+                phone: '',
+                address: ''
+            },
+            cart: [] // Kopiera innehållet från varukorgen här vid beställning
+        };
+        localStorage.setItem('currentOrder', JSON.stringify(defaultOrder));
+    }
+
+    // Hämta varukorgen från localStorage
+    const cart = JSON.parse(localStorage.getItem('cart')) || [];
+    const cartContainer = document.getElementById('cartDetails');
+
+    // Rensa tidigare innehåll i varukorgscontainern
+    cartContainer.innerHTML = '';
+
+    // Kontrollera om varukorgen är tom och visa ett meddelande
+    if (cart.length === 0) {
+        cartContainer.innerHTML = '<p>Din varukorg är tom!</p>';
         return;
     }
 
-    // Formulärvalidering
+    // Visa varukorgens innehåll och beräkna totalsumman
+    let total = 0;
+    cart.forEach(item => {
+        const itemTotal = item.quantity * item.price;
+        total += itemTotal;
+
+        // Skapa en visuell representation av varje produkt i varukorgen
+        const cartItem = document.createElement('div');
+        cartItem.classList.add('cart-item');
+        cartItem.innerHTML = `
+            <div class="d-flex align-items-center mb-3">
+                <img src="${item.image}" alt="${item.title}" class="img-thumbnail" style="width: 100px; height: 100px; margin-right: 10px;">
+                <p>${item.title} - Antal: ${item.quantity} - Pris: ${item.price} kr</p>
+                <p>Summa: ${itemTotal} kr</p>
+            </div>
+        `;
+        cartContainer.appendChild(cartItem);
+    });
+
+    // Visa totalsumman längst ner i varukorgen
+    const totalElement = document.createElement('p');
+    totalElement.innerHTML = `<strong>Totalsumma: ${total} kr</strong>`;
+    cartContainer.appendChild(totalElement);
+
+    // Hantera formulärinlämning för att skapa en ny order
     const form = document.getElementById('checkoutForm');
-    if (!form) {
-        console.error('Formuläret hittades inte!');
-        return;
-    }
-
     form.addEventListener('submit', function (e) {
         e.preventDefault();
 
+        // Hämta kunduppgifter från formuläret
         const name = document.getElementById('name').value.trim();
         const email = document.getElementById('email').value.trim();
         const phone = document.getElementById('phone').value.trim();
         const address = document.getElementById('address').value.trim();
-        const postal = document.getElementById('postal').value.trim();
-        const city = document.getElementById('city').value.trim();
 
-        let errors = [];
-
-        if (name.length < 2 || name.length > 50) errors.push("Namn måste vara 2–50 tecken.");
-        if (!email.includes('@') || email.length > 50) errors.push("Ogiltig e-post.");
-        if (!/^[0-9\-\(\) ]+$/.test(phone) || phone.length > 50) errors.push("Ogiltigt telefonnummer, Max 50 tecken.");
-        if (address.length < 2 || address.length > 50) errors.push("Ogiltig adress.");
-        if (!/^\d{5}$/.test(postal)) errors.push("Postnummer måste vara exakt 5 siffror.");
-        if (city.length < 2 || city.length > 50) errors.push("Ogiltig ort.");
-
-        if (errors.length > 0) {
-            alert("Formulärfel:\n" + errors.join("\n"));
-        } else {
-            const orderData = {
-                orderNumber: Math.floor(Math.random() * 1000000), // Slumpmässigt ordernummer
-                orderDate: new Date().toISOString(),
-                customer: {
-                    name: name,
-                    email: email,
-                    phone: phone,
-                    address:  {
-                        street: address,
-                        zip: postal,
-                        city: city
-                    }
-                },
-                product: {
-                    title: produkt || 'Okänd produkt',
-                    price: price || 'Okänt pris',
-                    image: image || 'okänd bild'
-                }
-               
-            };
-            localStorage.setItem('currentOrder', JSON.stringify(orderData));
-           
-            window.location.href = "kvitto.html";
+        // Kontrollera att alla fält är ifyllda
+        if (!name || !email || !phone || !address) {
+            alert('Vänligen fyll i alla fält!');
+            return;
         }
+
+        // Skapa en ny order med kunduppgifter och varukorgens innehåll
+        const newOrder = {
+            orderId: Math.floor(Math.random() * 100000).toString(),
+            orderDate: new Date().toLocaleDateString(),
+            customer: { name, email, phone, address },
+            cart: cart // Kopiera varukorgens innehåll
+        };
+
+        // Spara den nya ordern i localStorage
+        localStorage.setItem('currentOrder', JSON.stringify(newOrder));
+
+        // Rensa varukorgen från localStorage
+        localStorage.removeItem('cart');
+
+        // Skicka användaren till kvittosidan
+        window.location.href = 'kvitto.html';
     });
 });

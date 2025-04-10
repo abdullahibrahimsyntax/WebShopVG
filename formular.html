@@ -16,22 +16,22 @@
 
                 <div class="mb-3">
                     <label for="name" class="form-label">Namn:</label>
-                    <input type="text" id="name" name="name" class="form-control">
+                    <input type="text" id="name" name="name" class="form-control" autocomplete="name" required>
                 </div>
 
                 <div class="mb-3">
                     <label for="email" class="form label"> E-post:</label>
-                    <input type="email" id="email" name="email" class="form-control">
+                    <input type="email" id="email" name="email" class="form-control" autocomplete="email" required>
                 </div>
 
                 <div class="mb-3">
                     <label for="tel" class="form-label">Telefonnummer:</label>
-                    <input type="tel" id="phone" name="phone" class="form-control">
+                    <input type="tel" id="phone" name="phone" class="form-control" autocomplete="tel" required>
                 </div>
 
                 <div class="mb-3">
                     <label for="address" class="form-label">Adress:</label>
-                    <input type="text" id="address" name="address" class="form-control">
+                    <input type="text" id="address" name="address" class="form-control" autocomplete="street-address" required>
                 </div>
 
                 <div class="mb-3">
@@ -46,12 +46,11 @@
 
                 <input type="hidden" id="produkt" name="produkt">
                 
-                <button  type="submit" class="btn btn-primary w-100">
-                    Bekräfta beställning
+                <button type="submit" class="btn btn-primary w-100">
+                    Slutför Beställning
                 </button>
             </form>
-            <p id="productInfo" class="fw-bold"></p>
-
+            <div id="cartDetails"></div>
         </div>
 
         <script src="formularScript.js"></script>
